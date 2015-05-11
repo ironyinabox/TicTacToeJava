@@ -1,0 +1,139 @@
+package tic.tac.toe;
+import java.util.Scanner;
+public class TicTacToe {
+
+    public enum Node {X, O, E}
+    public int dim;
+    Node[] board; 
+    static Scanner inputReader = new Scanner(System.in);
+    
+
+    public TicTacToe(int dim){  //constructor allows player to customize board size
+        this.dim = dim;
+    }
+    void playeroneTurn(){         //method lays out the lifecycle of a turn
+        System.out.println(">>>>Player one move ");
+        int number = inputReader.nextInt();
+        if(number >= 1 && number <= dim*dim && board[number-1] == Node.E){
+            movePlayerone(number-1);
+            playertwoTurn();}
+        else { 
+            System.out.println("Invalid Entry! Try again!");
+            playeroneTurn();
+            }
+    }
+    void playertwoTurn(){       //as before
+        System.out.println(">>>>Player two move");
+        int number = inputReader.nextInt();
+        if(number >= 1 && number <= dim*dim && board[number-1] == Node.E){
+            movePlayertwo(number-1);
+            playeroneTurn();}
+        else{System.out.println("Invalid Entry! Try again!");
+            playertwoTurn();
+            } 
+    }
+    void startGame(){   //method builds board, displays, and intiates turn cycle
+        board = new Node[dim*dim];
+        for(int i=0; i<dim*dim; i++){
+        board[i] = Node.E;
+        }
+        printBoard();
+        playeroneTurn();
+    }    
+    void printBoard(){ //method prints board, accounting for varying board size
+        int count = 0;
+        while(count < (dim)){
+            for(int i=count*dim; i<=(count*dim)+(dim-1); i++){
+               System.out.print(board[i] + " ");
+            }
+            System.out.println();
+            count++;
+        }
+    }
+    void movePlayerone(int i){  //method performs move, then checks for victory or draw
+        board[i] = Node.X;      //if neither, turn cycle continues
+        printBoard();
+        declareVictory(Node.X);
+        if(isDraw()){
+            System.out.println("It's a draw Play again!");
+            startGame();
+        }
+        
+    }
+    void movePlayertwo(int i){
+        board[i] = Node.O;
+        printBoard();
+        declareVictory(Node.O);
+        if(isDraw()){
+            System.out.println("It's a draw Play again!");
+            startGame();
+        }
+        
+    }
+    void declareVictory(Node player){   //invokes all methods that check for victory conditions
+        if(checkDown(player) || checkAcross(player) || checkDownright(player) || checkUpright(player))
+        {System.out.println(player + " is victorious. Play again!");
+            startGame();}
+        
+    }
+    boolean checkDown(Node player){
+        for(int i = 0; i<=dim-1; i++){
+            int count = 0;
+            for(int n = i; n < dim*dim; n=n+dim){
+                if(board[n] == player) count++;  
+            }
+            if(count == dim) return true;
+        }
+        return false;
+    }
+    boolean checkAcross(Node player){
+        for(int i = 0; i<=dim*dim; i=i+dim){
+            int count = 0;
+            for(int n = i; n <= dim-1; n++){
+                if(board[n] == player) count++;  
+            }
+            if(count == dim) return true;
+        }
+        return false;
+    }
+    boolean checkDownright(Node player){
+        int count = 0;
+        for(int i = 0; i<=(dim*dim)-1; i=i+dim+1){
+            if(board[i] == player) count++;  
+            if(count == dim) return true;
+        }
+        return false;
+    }
+    boolean checkUpright(Node player){
+        int count = 0;
+        for(int i = (dim*dim)-dim; i>=dim-1; i=i-dim+1){
+            if(board[i] == player) count++;  
+            if(count == dim) return true;
+        }
+        return false;
+    }
+    boolean isDraw(){
+        for(Node n : board){
+            if(n==Node.E){
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    
+    public static void main(String[] args) {
+        System.out.println("Welcome to Tic Tac Toe!");
+        System.out.println("Positions on the board are numbered like so; ");
+        System.out.println("1 2 3");
+        System.out.println("4 5 6");
+        System.out.println("7 8 9");
+        System.out.println("Empty nodes are labeled E");
+        System.out.println("First to get the board's size in a row wins!");
+        System.out.println("Please select board size (enter 3 for traditional 3x3, or 4 for 4x4, etc.) :");
+        int number = inputReader.nextInt();
+        TicTacToe newgame = new TicTacToe(number);
+        newgame.startGame();
+    }
+    
+}
